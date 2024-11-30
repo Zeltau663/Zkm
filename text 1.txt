@@ -1,0 +1,599 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Zeltau663/Ksepdo3jrmfoej3u44j/refs/heads/main/Zkm')))()
+local Window = OrionLib:MakeWindow({
+    Name = "ZKM HUB | BETA", 
+    HidePremium = false, 
+    SaveConfig = true, 
+    ConfigFolder = "ZkmHubConfigs",
+    IntroEnabled = true,
+    IntroText = "ZKM Team",
+    IntroIcon = "rbxassetid://123573570247796",
+    Icon = "rbxassetid://123573570247796",
+    CloseCallback = function() 
+        print("Zkm hub")
+    end
+})
+
+OrionLib:MakeNotification({
+    Name = "Script",
+    Content = "ZKM Hub carregado com sucesso",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+local Players = game:GetService("Players")
+
+-- Quando um jogador entra no jogo
+Players.PlayerAdded:Connect(function(player)
+    OrionLib:MakeNotification({
+        Name = "AVISO!",
+        Content = player.Name .. " entrou no servidor.",
+        Image = "rbxassetid://17055169824", -- Substitua pelo ID da imagem desejada
+        Time = 5
+    })
+end)
+
+-- Quando um jogador sai do jogo
+Players.PlayerRemoving:Connect(function(player)
+    OrionLib:MakeNotification({
+        Name = "AVISO!",
+        Content = player.Name .. " saiu do servidor.",
+        Image = "rbxassetid://17055169824", -- Substitua pelo ID da imagem desejada
+        Time = 5
+    })
+end)
+
+-- Variáveis
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local infiniteJumpEnabled = false
+local noclipEnabled = false
+local loopColorEnabled = false
+local loopCurtainsEnabled = false
+local loopGarageEnabled = false
+local selectedPlayerName = ""
+local selectedHouseNumber = 1
+local repeatName = "DefaultName"
+local repeatBio = "DefaultBio"
+local rainbowNameEnabled = false
+local rainbowBioEnabled = false
+
+-- Funções
+local function getPlayerCount()
+    return #Players:GetPlayers()
+end
+
+local function getGameName()
+    return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+end
+
+local function getExecutor()
+    return identifyexecutor and identifyexecutor() or "Unknown"
+end
+
+local function toggleInfiniteJump(value)
+    infiniteJumpEnabled = value
+end
+
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJumpEnabled then
+        local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState("Jumping")
+        end
+    end
+end)
+
+local function toggleNoclip(value)
+    noclipEnabled = value
+    if noclipEnabled then
+        RunService.Stepped:Connect(function()
+            if noclipEnabled and LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+end
+
+local function loopColor()
+    while loopColorEnabled do
+        local event = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Player1sHous1e")
+        if event then
+            event:FireServer("ColorPickHouse", Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255)))
+        end
+        task.wait(0.9)
+    end
+end
+
+local function loopCurtains()
+    while loopCurtainsEnabled do
+        local event = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Player1sHous1e")
+        if event then
+            event:FireServer("Curtains")
+        end
+        task.wait(1)
+    end
+end
+
+local function loopGarage()
+    while loopGarageEnabled do
+        local event = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Player1sHous1e")
+        if event then
+            event:FireServer("GarageDoor")
+        end
+        task.wait(5)
+    end
+end
+
+local function changeRPNameColor(color)
+    local args = {
+        [1] = "PickingRPNameColor",
+        [2] = color
+    }
+    game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer(unpack(args))
+end
+
+local function changeRPBioColor(color)
+    local args = {
+        [1] = "PickingRPBioColor",
+        [2] = color
+    }
+    game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer(unpack(args))
+end
+
+-- Funções para loops de efeito arco-íris
+local function rainbowNameLoop()
+    while rainbowNameEnabled do
+        for i = 0, 1, 0.01 do
+            if not rainbowNameEnabled then break end
+            local color = Color3.fromHSV(i, 1, 1)
+            changeRPNameColor(color)
+            task.wait(0.9)
+        end
+    end
+end
+
+local function rainbowBioLoop()
+    while rainbowBioEnabled do
+        for i = 0, 1, 0.01 do
+            if not rainbowBioEnabled then break end
+            local color = Color3.fromHSV(i, 1, 1)
+            changeRPBioColor(color)
+            task.wait(0.9)
+        end
+    end
+end
+
+-- Tabs e Seções
+local InfoTab = Window:MakeTab({
+    Name = "Info",
+    Icon = "rbxassetid://17055169824",
+    PremiumOnly = false
+})
+
+
+local CreditosSection = InfoTab:AddSection({ Name = "créditos" })
+
+CreditosSection:AddLabel ("Owner | zeltauone")
+CreditosSection:AddLabel("zeltauone | Silent_xit | ruby09758 | João |  pluto | cat | haza ")
+CreditosSection:AddLabel("nosso discord| discord.gg/w3xEUW8Jw7")
+
+local CreditosSection = InfoTab:AddSection({ Name = "desempenho" })
+
+local RunService = game:GetService("RunService")
+
+local fpsLabel = CreditosSection:AddLabel("FPS: Calculando...")
+
+RunService.RenderStepped:Connect(function()
+    local fps = math.floor(1 / RunService.RenderStepped:Wait())
+    fpsLabel:Set("FPS: " .. fps)
+end)
+
+local CreditosSection = InfoTab:AddSection({ Name = "informações" })
+
+InfoTab:AddLabel("Players in Map: " .. getPlayerCount())
+InfoTab:AddLabel("Game Name: " .. getGameName())
+InfoTab:AddLabel("Executor: " .. getExecutor())
+
+-- Adicionar labels com informações
+InfoTab:AddLabel("ID do Jogo: " .. game.PlaceId)
+
+local MainTab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://10723407389",
+    PremiumOnly = false
+})
+
+local HubSection = MainTab:AddSection({
+    Name = "<Settings - Hub>"
+})
+
+
+local PlayerSection = MainTab:AddSection({
+    Name = "<Settings - Player>"
+})
+
+MainTab:AddTextbox({
+    Name = "JumpPower",
+    Default = "50",  
+    TextDisappear = true,
+    Callback = function(value)
+        local jumpPower = tonumber(value)
+        if jumpPower and LocalPlayer.Character then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = jumpPower
+        else
+            warn("Valor inválido para JumpPower.")
+        end
+    end
+})
+
+MainTab:AddTextbox({
+    Name = "WalkSpeed",
+    Default = "16",  
+    TextDisappear = true,
+    Callback = function(value)
+        local walkSpeed = tonumber(value)
+        if walkSpeed and LocalPlayer.Character then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = walkSpeed
+        else
+            warn("Valor inválido para WalkSpeed.")
+        end
+    end
+})
+
+MainTab:AddTextbox({
+    Name = "Gravity",
+    Default = "196.2",  
+    TextDisappear = true,
+    Callback = function(value)
+        local gravity = tonumber(value)
+        if gravity then
+            game:GetService("Workspace").Gravity = gravity
+        else
+            warn("Valor inválido para Gravity.")
+        end
+    end
+})
+
+MainTab:AddToggle({
+    Name = "Infinite Jump",
+    Default = false,
+    Callback = toggleInfiniteJump
+})
+
+MainTab:AddToggle({
+    Name = "Noclip",
+    Default = false,
+    Callback = toggleNoclip
+})
+
+-- TrollTab
+local TrollTab = Window:MakeTab({
+    Name = "troll",
+    Icon = "rbxassetid://10709782497",
+    PremiumOnly = false
+})
+
+local TeleportSection = TrollTab:AddSection({
+    Name = "Teleport/View Settings"
+})
+
+local function updatePlayerList()
+    local playerList = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerList, player.Name)
+        end
+    end
+    return playerList
+end
+
+TrollTab:AddDropdown({
+    Name = "Select Player",
+    Default = "",
+    Options = updatePlayerList(),
+    Callback = function(value)
+        selectedPlayerName = value
+    end
+})
+
+local function teleportToPlayer(playerName)
+    local targetPlayer = Players:FindFirstChild(playerName)
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local targetRootPart = targetPlayer.Character.HumanoidRootPart
+        LocalPlayer.Character:SetPrimaryPartCFrame(targetRootPart.CFrame)
+    else
+        warn("Jogador não encontrado ou sem personagem válido!")
+    end
+end
+
+TrollTab:AddButton({
+    Name = "Teleport to Player",
+    Callback = function()
+        if selectedPlayerName then
+            teleportToPlayer(selectedPlayerName)
+        else
+            warn("Selecione um jogador primeiro!")
+        end
+    end
+})
+
+local function teleportToRandomPlayer()
+    local players = updatePlayerList()
+    if #players > 0 then
+        local randomPlayer = players[math.random(1, #players)]
+        teleportToPlayer(randomPlayer)
+    else
+        warn("Nenhum jogador disponível para teleportar!")
+    end
+end
+
+TrollTab:AddButton({
+    Name = "Teleport to Random Player",
+    Callback = teleportToRandomPlayer
+})
+
+local function startSpectate(targetPlayer)
+    if targetPlayer and targetPlayer.Character then
+        workspace.CurrentCamera.CameraSubject = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    else
+        warn("Jogador não encontrado ou sem personagem válido!")
+    end
+end
+
+local function stopSpectate()
+    workspace.CurrentCamera.CameraSubject = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+end
+
+TrollTab:AddToggle({
+    Name = "Spectate Player",
+    Default = false,
+    Callback = function(enabled)
+        if enabled then
+            local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+            startSpectate(targetPlayer)
+        else
+            stopSpectate()
+        end
+    end
+})
+
+-- HouseTab
+local HouseTab = Window:MakeTab({
+    Name = "House",
+    Icon = "rbxassetid://10747382504",
+    PremiumOnly = false
+})
+
+local HouseSection = HouseTab:AddSection({
+    Name = "Pegar Permissão"
+})
+
+local houseOptions = {}
+for i = 1, 30 do
+    table.insert(houseOptions, "House " .. i)
+end
+
+HouseSection:AddDropdown({
+    Name = "Select House ",
+    Default = "House 1",
+    Options = houseOptions,
+    Callback = function(value)
+        selectedHouseNumber = tonumber(value:match("%d+")) or 1
+    end
+})
+
+HouseSection:AddButton({
+    Name = "Pegar Permissão",
+    Callback = function()
+        local event = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Playe1rTrigge1rEven1t")
+        if event then
+            event:FireServer("GivePermissionLoopToServer", LocalPlayer, selectedHouseNumber)
+        else
+            warn("Evento de permissão não encontrado!")
+        end
+    end
+})
+
+local LoopSection = HouseTab:AddSection({
+    Name = "House Loops"
+})
+
+LoopSection:AddToggle({
+    Name = "Loop Color (Casa)",
+    Default = false,
+    Callback = function(value)
+        loopColorEnabled = value
+        if value then
+            spawn(loopColor)
+        end
+    end
+})
+
+LoopSection:AddToggle({
+    Name = "Loop Cortinas",
+    Default = false,
+    Callback = function(value)
+        loopCurtainsEnabled = value
+        if value then
+            spawn(loopCurtains)
+        end
+    end
+})
+
+LoopSection:AddToggle({
+    Name = "Loop Garagem",
+    Default = false,
+    Callback = function(value)
+        loopGarageEnabled = value
+        if value then
+            spawn(loopGarage)
+        end
+    end
+})
+
+local AvatarTab = Window:MakeTab({
+    Name = "Avatar",
+    Icon = "rbxassetid://10734920149",
+    PremiumOnly = false
+})
+
+local RPSection = AvatarTab:AddSection({
+    Name = "Repeat"
+})
+
+RPSection:AddTextbox({
+    Name = "Repeat Name",
+    Default = "DefaultName",  
+    TextDisappear = false,
+    Callback = function(value)
+        repeatName = value
+        local args = {
+            [1] = "PickingRPName",
+            [2] = repeatName
+        }
+        game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer(unpack(args))
+    end
+})
+
+
+RPSection:AddTextbox({
+    Name = "Repeat Bio",
+    Default = "DefaultBio",  
+    TextDisappear = false,
+    Callback = function(value)
+        repeatBio = value
+        local args = {
+            [1] = "PickingRPBio",
+            [2] = repeatBio
+        }
+        game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer(unpack(args))
+    end
+})
+
+local RPSection = AvatarTab:AddSection({
+    Name = "Loop color"
+})
+
+RPSection:AddToggle({
+    Name = "Loop Name<Raimbow>",
+    Default = false,
+    Callback = function(value)
+        rainbowNameEnabled = value
+        if value then
+            spawn(rainbowNameLoop)
+        end
+    end
+})
+
+
+RPSection:AddToggle({
+    Name = "Loop Bio<Rainbow>",
+    Default = false,
+    Callback = function(value)
+        rainbowBioEnabled = value
+        if value then
+            spawn(rainbowBioLoop)
+        end
+    end
+})
+
+local OSTab = Window:MakeTab({
+ Name = "outhers",
+ Icon = "rbxassetid://128112463718435",
+ PremiumOnly = false
+})
+
+local ESPEnabled = false -- Variável para controlar o estado do ESP
+local ESPColor = Color3.fromRGB(255, 0, 0) -- Vermelho
+
+-- Função para criar o ESP
+local function createESP(player)
+    if player.Character then
+        local character = player.Character
+        for _, part in ipairs(character:GetDescendants()) do
+            if part:IsA("BasePart") and not part:FindFirstChild("ESP") then
+                local highlight = Instance.new("BoxHandleAdornment")
+                highlight.Name = "ESP"
+                highlight.Adornee = part
+                highlight.Size = part.Size + Vector3.new(0.1, 0.1, 0.1)
+                highlight.Color3 = ESPColor
+                highlight.AlwaysOnTop = true
+                highlight.ZIndex = 10
+                highlight.Transparency = 0.5
+                highlight.Parent = part
+            end
+        end
+    end
+end
+
+-- Função para ativar/desativar ESP
+local function toggleESP(state)
+    ESPEnabled = state
+    if ESPEnabled then
+        print("ESP ativado!")
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then -- Evita marcar o próprio jogador
+                createESP(player)
+            end
+        end
+        game.Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function()
+                if ESPEnabled then
+                    wait(1) -- Aguarde o personagem carregar
+                    createESP(player)
+                end
+            end)
+        end)
+    else
+        print("ESP desativado!")
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player.Character then
+                for _, part in ipairs(player.Character:GetDescendants()) do
+                    if part:FindFirstChild("ESP") then
+                        part.ESP:Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Adiciona o toggle ao menu
+OSTab:AddToggle({
+    Name = "Toggle ESP",
+    Default = false,
+    Callback = function(Value)
+        toggleESP(Value)
+    end
+})
+
+OSTab:AddToggle({
+    Name = "BOOST FPS",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            -- Ativar: remover texturas
+            for _, object in ipairs(game.Workspace:GetDescendants()) do
+                if object:IsA("Texture") or object:IsA("Decal") then
+                    object:Destroy()
+                elseif object:IsA("BasePart") and object.Material ~= Enum.Material.SmoothPlastic then
+                    object.Material = Enum.Material.SmoothPlastic
+                end
+            end
+        else
+            -- Desativar: mensagem ou lógica para restaurar (se necessário)
+            print("Texturas não podem ser restauradas automaticamente sem scripts adicionais.")
+        end
+    end
+})
+
+OrionLib:Init()
+
+
